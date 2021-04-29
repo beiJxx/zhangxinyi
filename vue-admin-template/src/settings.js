@@ -1,6 +1,6 @@
 module.exports = {
 
-  title: 'Vue Admin Template',
+  title: 'zxy manage platform',
 
   /**
    * @type {boolean} true | false

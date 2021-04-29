@@ -32,13 +32,15 @@ Vue.use(Router)
 export const constantRoutes = [
   {
     path: '/login',
-    component: () => import('@/views/login/index'),
+    // component: () => import('@/views/login/index'),
+    component: resolve => require(['@/views/login/index'], resolve),
     hidden: true
   },
 
   {
     path: '/404',
-    component: () => import('@/views/404'),
+    // component: () => import('@/views/404'),
+    component: resolve => require(['@/views/404'], resolve),
     hidden: true
   },
 
@@ -49,7 +51,8 @@ export const constantRoutes = [
     children: [{
       path: 'dashboard',
       name: 'Dashboard',
-      component: () => import('@/views/dashboard/index'),
+      // component: () => import('@/views/dashboard/index'),
+      component: resolve => require(['@/views/dashboard/index'], resolve),
       meta: {title: 'Dashboard', icon: 'dashboard'}
     }]
   },
@@ -188,7 +191,9 @@ export const constantRoutes = [
       },*/
       {
         path: 'upload-excel',
-        component: () => import('@/views/excel/upload-excel'),
+        // component: () => import('@/views/excel/upload-excel'),
+        component: resolve => require(['@/views/excel/upload-excel'], resolve),
+
         name: 'UploadExcel',
         meta: {title: 'Upload Excel'}
       }
