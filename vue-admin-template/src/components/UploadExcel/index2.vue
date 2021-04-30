@@ -167,7 +167,7 @@ export default {
 
 .drop {
   border: 2px dashed #bbb;
-  width: 450px;
+  width: 25%;
   height: 100px;
   line-height: 100px;
   margin: 20px auto;

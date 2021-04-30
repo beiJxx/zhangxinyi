@@ -99,8 +99,8 @@ export default {
             const results = XLSX.utils.sheet_to_json(worksheet)
             let count = 0;
             for (let i = 2; i < results.length; i++) {
-              var name = results[i].__EMPTY;
-              var company = results[i].__EMPTY_1;
+              var name = String(results[i].__EMPTY).replace(/\s+/g, "");
+              var company = String(results[i].__EMPTY_1).replace(/\s+/g, "");
               var balance = results[i].__EMPTY_7;
               if (name && company && balance) {
                 count++;
@@ -152,7 +152,7 @@ export default {
 
 .drop {
   border: 2px dashed #bbb;
-  width: 450px;
+  width: 25%;
   height: 100px;
   line-height: 100px;
   margin: 20px 0 0 0;

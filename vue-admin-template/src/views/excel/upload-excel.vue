@@ -11,7 +11,7 @@
     <el-dialog :visible.sync="dialogTableVisible1" title="手工台账多余记录">
       <div style="height: 700px">
         <el-input
-          v-model="JSON.stringify(gridData1,null,2)"
+          v-model="gridData1"
           :autosize="{ minRows: 20}"
           placeholder="请输入内容"
           readonly
@@ -22,7 +22,7 @@
     <el-dialog :visible.sync="dialogTableVisible2" title="贷款导出多余记录">
       <div style="height: 700px">
         <el-input
-          v-model="JSON.stringify(gridData2,null,2)"
+          v-model="gridData2"
           :autosize="{ minRows: 20}"
           readonly
           type="textarea">
@@ -51,16 +51,17 @@
             <el-table-column
               label="管护经理"
               prop="name"
-              width="120">
+              width="100px">
             </el-table-column>
             <el-table-column
               label="户名"
               prop="company"
-              width="500">
+              >
             </el-table-column>
             <el-table-column
               label="贷款余额"
               prop="balance"
+              width="100px"
             >
             </el-table-column>
           </el-table>
@@ -83,16 +84,17 @@
             <el-table-column
               label="责任人"
               prop="name"
-              width="120">
+              width="100">
             </el-table-column>
             <el-table-column
               label="客户名称"
               prop="company"
-              width="500">
+              >
             </el-table-column>
             <el-table-column
               label="贷款余额"
-              prop="balance">
+              prop="balance"
+              width="100px">
             </el-table-column>
           </el-table>
         </el-col>
@@ -119,30 +121,45 @@ export default {
       table2_1: null,
       dialogTableVisible1: false,
       dialogTableVisible2: false,
-      value: '',
-      gridData1: [],
-      gridData2: [],
-      gridData: [{
-        date: '2016-05-02',
-        name: 'John Smith',
-        address: 'No.1518,  Jinshajiang Road, Putuo District'
-      }, {
-        date: '2016-05-04',
-        name: 'John Smith',
-        address: 'No.1518,  Jinshajiang Road, Putuo District'
-      }, {
-        date: '2016-05-01',
-        name: 'John Smith',
-        address: 'No.1518,  Jinshajiang Road, Putuo District'
-      }, {
-        date: '2016-05-03',
-        name: 'John Smith',
-        address: 'No.1518,  Jinshajiang Road, Putuo District'
-      }]
+      gridData1: '',
+      gridData2: ''
     }
   }
   ,
   methods: {
+    onClickDownDaily() {
+      var title1 = '手工台账多余记录'
+      var title2 = '贷款导出多余记录'
+      var allStr = title1 + '\r\n' + this.gridData1 +
+                  '\r\n' +
+                    title2 + '\r\n' + this.gridData2
+      var export_blob = new Blob([allStr]);
+      var save_link = document.createElement("a");
+      save_link.href = window.URL.createObjectURL(export_blob);
+      save_link.download = '对比结果'+'.txt';
+      this.fakeClick(save_link);
+    },
+    fakeClick(obj) {
+      var ev = document.createEvent("MouseEvents");
+      ev.initMouseEvent(
+        "click",
+        true,
+        false,
+        window,
+        0,
+        0,
+        0,
+        0,
+        0,
+        false,
+        false,
+        false,
+        false,
+        0,
+        null
+      );
+      obj.dispatchEvent(ev);
+    },
     beforeUpload(file) {
       const isLt1M = file.size / 1024 / 1024 < 10
 
@@ -151,8 +168,7 @@ export default {
       }
       this.$message.warning('文件大小不能超过10M')
       return false
-    }
-    ,
+    },
     handleSuccess1(excelData) {
       this.r1Array = excelData.resultsArray;
       if (excelData.resultsArray.length === 0) {
@@ -161,8 +177,7 @@ export default {
       }
       this.file1Name = excelData.fileName
       this.$message.success('手工台账excel 上传成功！')
-    }
-    ,
+    },
     handleSuccess2(excelData) {
       this.r2Array = excelData.resultsArray
       if (excelData.resultsArray.length === 0) {
@@ -171,8 +186,7 @@ export default {
       }
       this.file2Name = excelData.fileName
       this.$message.success('贷款导出excel 上传成功！')
-    }
-    ,
+    },
     handleCompare() {
       if (!this.file1Name || !this.r1Array) {
         this.$message.error('请上传 手工台账excel！')
@@ -189,38 +203,34 @@ export default {
 
       let gd_all = [];
       let t1_2 = [];
-      let gd1_2 = [];
+      let gd1_2 = '';
       r1.sort((a, b) => a.localeCompare(b))
         .filter(function (v) {
           let split = v.split('-');
           if (r2.indexOf(v) === -1) {
             t1_2.push({'name': split[0], 'company': split[1], 'balance': split[2]})
-            gd1_2.push(split[0] + '-' + split[1] + '-' + split[2]);
+            gd1_2 += split[0] + '-' + split[1] + '-' + split[2] + '\r\n';
           }
         })
-      // t1_2.sort((a, b) => a.name.localeCompare(b.name))
       this.table1_2 = t1_2
       this.gridData1 = gd1_2;
 
       let t2_1 = [];
-      let gd2_1 = [];
+      let gd2_1 = '';
       r2.sort((a, b) => a.localeCompare(b))
-        .filter(function (v) {
+        .forEach((v) => {
           let split = v.split('-');
           if (r1.indexOf(v) === -1) {
             t2_1.push({'name': split[0], 'company': split[1], 'balance': split[2]})
-            gd2_1.push(split[0] + '-' + split[1] + '-' + split[2]);
+            gd2_1 += split[0] + '-' + split[1] + '-' + split[2] + '\r\n';
           }
         })
-      // t2_1.sort((a, b) => a.name.localeCompare(b.name))
       this.gridData2 = gd2_1;
       this.table2_1 = t2_1
-      gd_all.push(gd1_2);
-      gd_all.push(gd2_1);
-      this.gridData = gd_all
-      console.dir(gd_all);
-    }
-    ,
+
+
+      this.onClickDownDaily()
+    },
     balanceFormatter(row, column, cellValue) {
       cellValue += '';
       if (!cellValue.includes('.')) cellValue += '.';
@@ -234,7 +244,7 @@ export default {
 <style>
 .drop {
   border: 2px dashed #bbb;
-  width: 450px;
+  width: 25%;
   height: 100px;
   line-height: 100px;
   margin: -120px 0 0 70%;
@@ -243,32 +253,6 @@ export default {
   text-align: center;
   color: #bbb;
   position: absolute;
-}
-
-.abow_dialog {
-  display: flex;
-  justify-content: center;
-  align-items: Center;
-  overflow: hidden;
-
-.el-dialog {
-  margin: 0 auto !important;
-  height: 90%;
-  overflow: hidden;
-
-.el-dialog__body {
-  position: absolute;
-  left: 0;
-  top: 54px;
-  bottom: 0;
-  right: 0;
-  padding: 0;
-  z-index: 1;
-  overflow: hidden;
-  overflow-y: auto;
-}
-
-}
 }
 
 </style>
