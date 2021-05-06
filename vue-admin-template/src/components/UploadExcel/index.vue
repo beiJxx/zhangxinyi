@@ -2,13 +2,14 @@
   <div style="margin-left: 20px">
     <input ref="excel-upload-input" accept=".xlsx, .xls" class="excel-upload-input" type="file" @change="handleClick">
     <div class="drop" @dragenter="handleDragover" @dragover="handleDragover" @drop="handleDrop">
-      <label>{{ excelData.fileName ? '( ' + excelData.fileName + ' ) ' + ' 已上传' : (loading ? '正在上传。。。' : '手工台账(未上传)') }}</label>
-      <el-button v-loading.fullscreen.lock="loading"
+      <label v-show="excelData.fileName">{{ excelData.fileName ? '( ' + excelData.fileName + ' ) ' + ' 已上传' : (loading ? '正在上传。。。' : '手工台账(未上传)') }}</label>
+      <el-button v-show="!excelData.fileName"
+                 v-loading.fullscreen.lock="loading"
                  element-loading-background="rgba(0, 0, 0, 0.8)"
                  element-loading-spinner="el-icon-loading"
                  element-loading-text="拼命加载中"
-                 size="mini" style="margin-left:16px;" type="primary" @click="handleUpload">
-        选择文件
+                 type="primary" @click="handleUpload">
+        选择文件 (手工台账)
       </el-button>
     </div>
   </div>

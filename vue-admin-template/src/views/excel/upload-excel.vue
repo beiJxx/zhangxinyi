@@ -3,24 +3,23 @@
     <upload-excel-component :before-upload="beforeUpload" :on-success="handleSuccess1"/>
     <upload-excel-component2 :before-upload="beforeUpload" :on-success="handleSuccess2"/>
     <div class="drop">
-      <el-button :disabled="false" type="success" @click="handleCompare">
+      <el-button type="success" @click="handleCompare">
         开始比对
       </el-button>
     </div>
 
     <el-dialog :visible.sync="dialogTableVisible1" title="手工台账多余记录">
-      <div style="height: 700px">
+      <div style="height: 600px">
         <el-input
           v-model="gridData1"
           :autosize="{ minRows: 20}"
-          placeholder="请输入内容"
           readonly
           type="textarea">
         </el-input>
       </div>
     </el-dialog>
     <el-dialog :visible.sync="dialogTableVisible2" title="贷款导出多余记录">
-      <div style="height: 700px">
+      <div style="height: 600px">
         <el-input
           v-model="gridData2"
           :autosize="{ minRows: 20}"
