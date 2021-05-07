@@ -113,7 +113,7 @@ export default {
           } else {
 
 
-            for (let i = 2; i < results.length; i++) {
+            for (let i = 0; i < results.length; i++) {
               // console.log(results[i])
               var name = results[i].责任人.replace(/\s+/g, "");
               var company = results[i].客户名称.replace(/\s+/g, "");
@@ -121,6 +121,7 @@ export default {
               var filter = results[i].业务登记人条线.replace(/\s+/g, "");
               var filterAll = ['大贷业务条线', '小企业业务条线']
               if (name && company && balance && filterAll.indexOf(filter) !== -1) {
+              // if (name && company && balance ) {
                 count++;
                 // console.log(name + '-' + company + '-' + balance)
                 resultsArray.push(name + '-' + company + '-' + balance);
