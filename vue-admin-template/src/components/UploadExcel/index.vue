@@ -28,6 +28,8 @@ export default {
       loading: false,
       excelData: {
         resultsArray: [],
+        totalBalance:'',
+        groupBalanceMap: new Map(),
         fileName: null
       }
     }
@@ -92,29 +94,45 @@ export default {
           const firstSheetName = workbook.SheetNames[0]
           const worksheet = workbook.Sheets[firstSheetName]
           const header = this.getHeaderRow(worksheet)
-          let resultsArray = [];
+          const resultsArray = [];
           if (header[0].indexOf('贷款明细') === -1) {
             this.generateData(resultsArray)
             this.loading = false
           } else {
             const results = XLSX.utils.sheet_to_json(worksheet)
             let count = 0;
+            let totalBalance = 0;
+            const groupBalanceMap = new Map();
             for (let i = 2; i < results.length; i++) {
-              var name = String(results[i].__EMPTY).replace(/\s+/g, "");
-              var company = String(results[i].__EMPTY_1).replace(/\s+/g, "");
+              var name = String(results[i].__EMPTY).replace(/\s+/g, '');
+              var company = String(results[i].__EMPTY_1).replace(/\s+/g, '');
               var balance = results[i].__EMPTY_7;
               if (name && company && balance) {
                 count++;
                 if (name && name.length > 6) {
                   name = name.substring(0, name.length - 6);
                 }
-                // console.dir(name + '-' + company + '-' + balance * 10000)
-                resultsArray.push(name + '-' + company + '-' + balance * 10000);
+                var formatBalance = balance * 10000;
+                // console.dir(name + '-' + company + '-' + formatBalance)
+                resultsArray.push(name + '-' + company + '-' + formatBalance)
+
+                if (groupBalanceMap.has(name)) {
+                  groupBalanceMap.set(name, groupBalanceMap.get(name) + formatBalance)
+                }else {
+                  groupBalanceMap.set(name, formatBalance);
+                }
+                totalBalance += formatBalance
               }
             }
             console.log('count:' + count);
+            console.log('totalBalance:' + totalBalance);
+            groupBalanceMap.forEach(function (v,k){
+              console.log('key:' + k + ',value:' + v);
+            })
             // console.log(resultsArray)
             this.excelData.fileName = rawFile.name;
+            this.excelData.groupBalanceMap = groupBalanceMap;
+            this.excelData.totalBalance = totalBalance;
             this.generateData(resultsArray)
             this.loading = false
             resolve()

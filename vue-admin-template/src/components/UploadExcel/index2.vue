@@ -28,6 +28,8 @@ export default {
       loading: false,
       excelData: {
         resultsArray: [],
+        totalBalance:'',
+        groupBalanceMap:new Map(),
         fileName: null
       }
     }
@@ -111,7 +113,8 @@ export default {
             this.generateData(resultsArray)
             this.loading = false
           } else {
-
+            let totalBalance = 0;
+            const groupBalanceMap = new Map();
 
             for (let i = 0; i < results.length; i++) {
               // console.log(results[i])
@@ -122,14 +125,27 @@ export default {
               var filterAll = ['大贷业务条线', '小企业业务条线']
               if (name && company && balance && filterAll.indexOf(filter) !== -1) {
               // if (name && company && balance ) {
+                var formatBalance = parseInt(balance)
                 count++;
-                // console.log(name + '-' + company + '-' + balance)
-                resultsArray.push(name + '-' + company + '-' + balance);
+                // console.log(name + '-' + company + '-' + formatBalance)
+                resultsArray.push(name + '-' + company + '-' + formatBalance);
+                totalBalance += formatBalance;
+                if (groupBalanceMap.has(name)){
+                  groupBalanceMap.set(name, groupBalanceMap.get(name) + formatBalance)
+                }else {
+                  groupBalanceMap.set(name, formatBalance)
+                }
               }
             }
             console.log('count:' + count);
+            console.log('totalBalance:' + totalBalance);
+            groupBalanceMap.forEach(function (v,k){
+              console.log('key:' + k + ',value:' + v);
+            })
             // console.log(resultsArray)
             this.excelData.fileName = rawFile.name;
+            this.excelData.groupBalanceMap = groupBalanceMap;
+            this.excelData.totalBalance = totalBalance;
             this.generateData(resultsArray)
             this.loading = false
             resolve()

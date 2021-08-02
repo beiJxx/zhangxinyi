@@ -115,6 +115,10 @@ export default {
       r2Array: [],
       file1Name: null,
       file2Name: null,
+      totalBalance1: null,
+      totalBalance2: null,
+      groupBalanceMap1: new Map(),
+      groupBalanceMap2: new Map(),
       // table1_2: [{'name': 11, 'company': 11, 'balance': 11}, {'name': 11, 'company': 11, 'balance': 11}, {'name': 11, 'company': 11, 'balance': 11}],
       table1_2: null,
       table2_1: null,
@@ -129,9 +133,27 @@ export default {
     onClickDownDaily() {
       var title1 = '手工台账多余记录'
       var title2 = '贷款导出多余记录'
-      var allStr = title1 + '\r\n' + this.gridData1 +
-                  '\r\n' +
-                    title2 + '\r\n' + this.gridData2
+      var allStr = title1 + '\r\n' + this.gridData1 + '\r\n'
+                  + title2 + '\r\n' + this.gridData2 + '\r\n'
+                  + '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' +'\r\n'
+                  + '手工台账总余额: ' + this.totalBalance1 + '\r\n'
+                  + '贷款导出总余额: ' + this.totalBalance2 + '\r\n\r\n';
+      var map = new Map();
+      map = this.groupBalanceMap2;
+      //1和2对比，2对比过的就delete，然后对delete之后的2进行遍历
+      this.groupBalanceMap1.forEach(function(value,key){
+        let v1 = value;
+        let v2 = 0;
+        if (map.has(key)){
+          v2 = map.get(key);
+          map.delete(key);
+        }
+        allStr += key + ' 手工台账: ' + v1 + ',贷款导出: ' + v2 + '\r\n';
+      })
+      map.forEach(function(value,key){
+        allStr += key + ' 手工台账: 0,贷款导出: ' + value + '\r\n';
+      })
+
       var export_blob = new Blob([allStr]);
       var save_link = document.createElement("a");
       save_link.href = window.URL.createObjectURL(export_blob);
@@ -174,6 +196,8 @@ export default {
         this.$message.error('文件选择有误，请选择正确的 手工台账excel！')
         return
       }
+      this.totalBalance1 = excelData.totalBalance;
+      this.groupBalanceMap1 = excelData.groupBalanceMap;
       this.file1Name = excelData.fileName
       this.$message.success('手工台账excel 上传成功！')
     },
@@ -183,6 +207,8 @@ export default {
         this.$message.error('文件选择有误，请选择正确的 贷款导出excel！')
         return
       }
+      this.totalBalance2 = excelData.totalBalance;
+      this.groupBalanceMap2 = excelData.groupBalanceMap;
       this.file2Name = excelData.fileName
       this.$message.success('贷款导出excel 上传成功！')
     },
@@ -227,7 +253,6 @@ export default {
       this.gridData2 = gd2_1;
       this.table2_1 = t2_1
 
-
       this.onClickDownDaily()
     },
     balanceFormatter(row, column, cellValue) {
@@ -236,6 +261,13 @@ export default {
       return cellValue.replace(/(\d)(?=(\d{3})+\.)/g, function ($0, $1) {
         return $1 + ',';
       }).replace(/\.$/, '');
+    },
+    formatWidth(str, width){
+      str += ' '
+      if(str.length < width)
+        return this.formatWidth(str, width)
+      else
+        return str
     }
   }
 }
